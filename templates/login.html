@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>RPG Login World</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div id="ui-layer">
+        <div class="input-display">
+            <label>UTILISATEUR :</label>
+            <input type="text" id="vis-username" class="hud-input active" readonly>
+        </div>
+        <div class="input-display">
+            <label>MOT DE PASSE :</label>
+            <input type="password" id="vis-password" class="hud-input" readonly>
+        </div>
+        <div class="instructions">
+            [Z,Q,S,D]: Bouger <br>
+            [F] : Entrer / Valider <br>
+            [TAB] : Changer de champ <br>
+            Allez sur la dalle "LOGIN" pour valider
+        </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <form id="hidden-form" method="POST" style="display:none;">
+        <input type="text" name="username" id="real-username">
+        <input type="password" name="password" id="real-password">
+    </form>
+
+    <script src="{{ url_for('static', filename='game.js') }}"></script>
+</body>
+</html>
