@@ -10,6 +10,12 @@ window.onload = function() {
     }
     const ctx = canvas.getContext('2d');
 
+    // --- 0. CHARGEMENT DE LA TEXTURE ---
+    // On crée l'objet image pour la texture
+    const keyTexture = new Image();
+    // Assurez-vous que l'image est bien dans static/images/
+    keyTexture.src = '/static/images/case.png'; 
+
     // --- 1. CONFIGURATION ---
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -17,7 +23,6 @@ window.onload = function() {
     // Position de départ
     const player = { x: canvas.width / 2, y: canvas.height / 2, size: 20, speed: 5, color: '#2ecc71' };
     
-    // On stocke les touches pressées
     const keysPressed = {};
     
     let currentWorld = 'hub';
@@ -30,49 +35,109 @@ window.onload = function() {
         realPass: document.getElementById('real-password')
     };
 
-    // --- 2. DONNÉES DES MONDES ---
-    function createGrid(chars, startX, startY) {
+   // --- 2. DONNÉES DES MONDES ---
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function isOverlapping(x, y, size, existingObjects) {
+        const margin = 10; 
+        for (let obj of existingObjects) {
+            const dist = Math.sqrt( ((x)-(obj.x))**2 + ((y)-(obj.y))**2 );
+            if (dist < (size + margin)) {
+                return true; 
+            }
+        }
+        return false; 
+    }
+
+    function createScatteredWorld(chars, thisWorld) {
         let objects = [];
-        let x = startX;
-        let y = startY;
-        chars.forEach((char, index) => {
-            objects.push({ type: 'key', val: char, x: x, y: y, size: 40, color: '#ecf0f1' });
-            x += 60;
-            if ((index + 1) % 10 === 0) { 
-                x = startX;
-                y += 60;
+        const minX = canvas.width / 2;       
+        const maxX = canvas.width - 60;      
+        const minY = 80;                     
+        const maxY = canvas.height - 150;    
+
+        chars.forEach(char => {
+            let placed = false;
+            let attempts = 0;
+            let size = 45; 
+
+            while (!placed && attempts < 100) {
+                let randomX = getRandomInt(minX, maxX);
+                let randomY = getRandomInt(minY, maxY);
+
+                if (!isOverlapping(randomX, randomY, size, objects)) {
+                    // Note: On garde la propriété color pour l'effet de flash quand on clique
+                    objects.push({ type: 'key', val: char, x: randomX, y: randomY, size: size, color: '#ecf0f1' });
+                    placed = true;
+                }
+                attempts++;
             }
         });
-        objects.push({ type: 'door', target: 'hub', label: 'SORTIE', x: 50, y: 50, size: 60, color: '#e74c3c' });
+
+        // Touche BACK
+        objects.push({ 
+            type: 'key', val: 'BACK', label: '⌫', 
+            x: canvas.width - 70, y: 30, size: 50, color: '#c0392b' 
+        });
+
+        // Barre de navigation
+        const doorSize = 50;
+        const doorY = canvas.height - 80;
+        const gapDoor = 70;
+        const startDoorX = canvas.width - (4 * gapDoor) - 50;
+
+        const slots = [
+            { id: 'lowercase', label: 'abc' },
+            { id: 'uppercase', label: 'ABC' },
+            { id: 'numbers',   label: '123' },
+            { id: 'special',   label: '@#&' }
+        ];
+
+        slots.forEach((slot, index) => {
+            let posX = startDoorX + (index * gapDoor);
+            let target = slot.id;
+            let label = slot.label;
+            let color = '#e67e22';
+
+            if (target === thisWorld) {
+                target = 'hub';
+                label = 'SORTIE';
+                color = '#e74c3c';
+            }
+            objects.push({ type: 'door', target: target, label: label, x: posX, y: doorY, size: doorSize, color: color });
+        });
+
         return objects;
     }
 
     const worlds = {
         'hub': [
-            { type: 'door', target: 'lowercase', label: 'abc', x: canvas.width/2 - 200, y: 100, size: 80, color: '#e67e22' },
-            { type: 'door', target: 'uppercase', label: 'ABC', x: canvas.width/2 + 120, y: 100, size: 80, color: '#e67e22' },
-            { type: 'door', target: 'numbers', label: '123', x: canvas.width/2 - 200, y: 400, size: 80, color: '#e67e22' },
-            { type: 'door', target: 'special', label: '@#&', x: canvas.width/2 + 120, y: 400, size: 80, color: '#e67e22' },
-            { type: 'submit', label: 'LOGIN', x: canvas.width/2 - 50, y: canvas.height - 100, size: 100, color: '#3498db' }
+            { type: 'key', val: 'BACK', label: '⌫', x: canvas.width - 70, y: 30, size: 50, color: '#c0392b' },
+            { type: 'door', target: 'lowercase', label: 'abc', x: canvas.width/2 - 200, y: 150, size: 80, color: '#e67e22' },
+            { type: 'door', target: 'uppercase', label: 'ABC', x: canvas.width/2 - 50, y: 150, size: 80, color: '#e67e22' },
+            { type: 'door', target: 'numbers',   label: '123', x: canvas.width/2 + 100, y: 150, size: 80, color: '#e67e22' },
+            { type: 'door', target: 'special',   label: '@#&', x: canvas.width/2 - 50, y: 350, size: 80, color: '#e67e22' },
+            { type: 'submit', label: 'LOGIN', x: canvas.width/2 - 50, y: canvas.height - 150, size: 100, color: '#3498db' }
         ],
-        'lowercase': createGrid("azertyuiopqsdfghjklmwxcvbn".split(''), 100, 150),
-        'uppercase': createGrid("AZERTYUIOPQSDFGHJKLMWXCVBN".split(''), 100, 150),
-        'numbers': createGrid("1234567890".split(''), 100, 150),
-        'special': createGrid("&é'(-è_çà)=~#{[|`\\^@]}".split(''), 100, 150)
+        'lowercase': createScatteredWorld("azertyuiopqsdfghjklmwxcvbn".split(''), 'lowercase'),
+        'uppercase': createScatteredWorld("AZERTYUIOPQSDFGHJKLMWXCVBN".split(''), 'uppercase'),
+        'numbers':   createScatteredWorld("1234567890".split(''), 'numbers'),
+        'special':   createScatteredWorld("&é'(-è_çà)=~#{[|`\\^@]}".split(''), 'special')
     };
 
-    // --- 3. GESTION DES TOUCHES (CORRIGÉE) ---
+    // --- 3. GESTION DES TOUCHES ---
     window.addEventListener('keydown', e => {
-        // On convertit la touche en minuscule pour éviter les problèmes Maj/Min
-        // ex: 'Z' devient 'z', 'ArrowUp' reste 'ArrowUp'
         let key = e.key;
         if (key.length === 1) key = key.toLowerCase(); 
 
-        console.log("Touche enfoncée :", key); // <--- REGARDEZ LA CONSOLE (F12)
+        console.log("Touche enfoncée :", key);
         keysPressed[key] = true;
 
         if (key === 'f') checkInteraction();
-        if (key === 'tab') { e.preventDefault(); switchField(); }
+        if (key === 'k' || key === 'tab') { e.preventDefault(); switchField(); }
         if (key === 'backspace') typeChar('BACK');
     });
 
@@ -84,36 +149,52 @@ window.onload = function() {
 
     // --- 4. LOGIQUE DU JEU ---
     function update() {
-        // Déplacement (On vérifie minuscules et ArrowKeys)
         if (keysPressed['arrowup'] || keysPressed['z']) player.y -= player.speed;
         if (keysPressed['arrowdown'] || keysPressed['s']) player.y += player.speed;
         if (keysPressed['arrowleft'] || keysPressed['q']) player.x -= player.speed;
         if (keysPressed['arrowright'] || keysPressed['d']) player.x += player.speed;
 
-        // Limites
         if (player.x < 0) player.x = 0;
         if (player.y < 0) player.y = 0;
         if (player.x > canvas.width) player.x = canvas.width;
         if (player.y > canvas.height) player.y = canvas.height;
     }
 
+    // --- 5. DESSIN (MODIFIÉ POUR LA TEXTURE) ---
     function draw() {
         ctx.fillStyle = '#2c3e50';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Objets
         const objects = worlds[currentWorld];
         if(objects) {
             objects.forEach(obj => {
-                ctx.fillStyle = obj.color;
-                ctx.fillRect(obj.x, obj.y, obj.size, obj.size);
                 
+                // --- MODIFICATION ICI : DESSIN DE L'IMAGE ---
+                if (obj.type === 'key') {
+                    // On dessine l'image case.png
+                    ctx.drawImage(keyTexture, obj.x, obj.y, obj.size, obj.size);
+
+                    // Si la touche a été activée (couleur verte), on ajoute un filtre vert par dessus
+                    if (obj.color !== '#ecf0f1' && obj.val !== 'BACK') {
+                         ctx.fillStyle = 'rgba(46, 204, 113, 0.5)'; // Vert transparent
+                         ctx.fillRect(obj.x, obj.y, obj.size, obj.size);
+                    }
+                } else {
+                    // Pour les portes et le submit, on garde les carrés de couleur
+                    ctx.fillStyle = obj.color;
+                    ctx.fillRect(obj.x, obj.y, obj.size, obj.size);
+                }
+
+                // --- DESSIN DU TEXTE (Amélioré avec ombre pour lisibilité sur texture) ---
                 ctx.fillStyle = 'white';
-                ctx.font = '16px Arial';
+                ctx.shadowColor = "black"; // Ombre noire pour que le texte ressorte
+                ctx.shadowBlur = 4;
+                ctx.font = 'bold 18px Arial';
                 ctx.textAlign = 'center';
                 ctx.fillText(obj.label || obj.val, obj.x + obj.size/2, obj.y + obj.size/2 + 6);
+                ctx.shadowBlur = 0; // On reset l'ombre
 
-                // Interaction
+                // Interaction (Cadre jaune)
                 if (getDistance(player, obj) < 50) {
                     ctx.strokeStyle = 'yellow';
                     ctx.lineWidth = 3;
@@ -139,7 +220,7 @@ window.onload = function() {
         draw();
     }
 
-    // --- 5. FONCTIONS UTILES ---
+    // --- 6. INTERACTIONS ---
     function getDistance(p, obj) {
         return Math.sqrt( ((p.x + p.size/2)-(obj.x + obj.size/2))**2 + ((p.y + p.size/2)-(obj.y + obj.size/2))**2 );
     }
@@ -159,8 +240,11 @@ window.onload = function() {
                 player.y = canvas.height / 2;
             } else if (target.type === 'key') {
                 typeChar(target.val);
-                target.color = '#2ecc71';
-                setTimeout(() => target.color = '#ecf0f1', 150);
+                // Petit effet visuel
+                let originalColor = target.color;
+                target.color = '#2ecc71'; // Vert
+                // On remet la couleur normale après 150ms
+                setTimeout(() => target.color = originalColor, 150);
             } else if (target.type === 'submit') {
                 document.getElementById('hidden-form').submit();
             }
