@@ -1,10 +1,160 @@
 <!DOCTYPE html>
-<html>
-<head><title>Tableau de bord</title></head>
-<body>
-    <h1>Bienvenue dans la zone secrète, {{ name }} !</h1>
-    <p>Vous êtes connecté avec succès à la base de données.</p>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Trésor Découvert</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=MedievalSharp&display=swap" rel="stylesheet">
     
-    <a href="/logout">Se déconnecter</a>
+    <style>
+        /* --- Moteur d'Ambiance (Background) --- */
+        body {
+            background-color: #1a0b0b; /* Fond sombre pour le contraste */
+            background-image: radial-gradient(circle at center, #2e1a1a 0%, #000000 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            font-family: 'MedievalSharp', cursive;
+            overflow: hidden;
+        }
+
+        /* --- Le Coffre / La Carte de Loot --- */
+        .treasure-card {
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid #b8860b; /* Bordure dorée */
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            width: 350px;
+            
+            /* L'Ombre portée et la lueur dorée (Legendary Glow) */
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2), 
+                        inset 0 0 50px rgba(0, 0, 0, 0.8);
+            
+            /* Animation d'apparition (Pop) */
+            animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) both;
+        }
+
+        /* Effet de rareté (Légendaire) */
+        .treasure-card::before {
+            content: '';
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.5;
+            animation: borderGlow 10s linear infinite;
+        }
+
+        /* --- L'Icone de l'objet (Flottement) --- */
+        .item-icon {
+            font-size: 80px;
+            display: block;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 15px gold);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* --- Typographie RPG --- */
+        h2 {
+            font-family: 'Cinzel', serif;
+            color: #ffd700; /* Or */
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 10px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .rarity {
+            color: #ff8000; /* Couleur Légendaire classique */
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .stats {
+            color: #ccc;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            border-top: 1px solid #555;
+            border-bottom: 1px solid #555;
+            padding: 15px 0;
+        }
+
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .bonus { color: #00ff00; } /* Vert pour les bonus stats */
+
+        /* --- Bouton d'Action --- */
+        .btn-claim {
+            background: linear-gradient(to bottom, #8b0000, #500000);
+            color: #fff;
+            border: 1px solid #ff4500;
+            padding: 12px 30px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-shadow: 1px 1px 2px black;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .btn-claim:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to bottom, #a50000, #700000);
+            box-shadow: 0 0 15px #ff4500;
+        }
+
+        /* --- Animations Keyframes --- */
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes borderGlow {
+            0% { background-position: 0 0; }
+            100% { background-position: 400% 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="treasure-card">
+        <span class="item-icon">🔌</span>
+        
+        <span class="rarity">Connection Réussite</span>
+        <h2>MECI</h2>
+        
+        <div class="stats">
+            <div class="stat-line">Nom d'utilisateur: <span>{{name}}</span></div>
+            
+            <br>
+            <div class="stat-line bonus">Bravo vous avez atteint la fin </div>
+            <div class="stat-line bonus">Bonne continuation à vous !</div>
+            <div class="stat-line" style="color: gold; font-style:italic; font-size: 0.8em; margin-top:5px;">
+                "Une lueur ancienne émane de cette entreprise..."
+            </div>
+        </div>
+
+        <button class="btn-claim">S'équiper</button>
+    </div>
+
 </body>
 </html>

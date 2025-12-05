@@ -1,9 +1,9 @@
 window.onload = function() {
-    console.log("🚀 Démarrage du jeu avec le Chevalier...");
+    console.log("Démarrage du jeu avec le Chevalier...");
 
     const canvas = document.getElementById('gameCanvas');
     if (!canvas) {
-        console.error("❌ Canvas introuvable !");
+        console.error("Canvas introuvable !");
         return;
     }
     const ctx = canvas.getContext('2d');
@@ -39,7 +39,7 @@ window.onload = function() {
         door_login: new Image()
     };
 
-    // Chemins des images
+    // url des images
     textures.player.src = '/static/images/knight.png'; 
     textures.key.src = '/static/images/case.png';
     textures.door_abc.src = '/static/images/door_uncap.png';
@@ -49,7 +49,7 @@ window.onload = function() {
     textures.door_exit.src = '/static/images/door_exit.png';
     textures.door_login.src = '/static/images/door_login.png';
 
-    // --- 3. FONCTIONS UTILITAIRES (MATHS) ---
+    // --- 3. FONCTIONS UTILITAIRES---
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
@@ -67,7 +67,7 @@ window.onload = function() {
         return false; 
     }
 
-    // --- 4. CRÉATION DES MONDES ---
+    // --- CRÉATION DES MONDES ---
     function createScatteredWorld(chars, thisWorld) {
         let objects = [];
         const minX = canvas.width / 2;       
@@ -274,9 +274,8 @@ window.onload = function() {
             });
         }
 
-        // --- DESSIN JOUEUR (MODIFIÉ) ---
+        // --- DESSIN JOUEUR  ---
         if (textures.player.complete && textures.player.naturalHeight !== 0) {
-            // On dessine l'image knight.png
             ctx.drawImage(textures.player, player.x, player.y, player.size, player.size);
         } else {
             // Fallback si l'image n'est pas encore chargée (carré vert)
