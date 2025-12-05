@@ -3,29 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <title>RPG Login World</title>
+    <!-- On garde ton lien CSS externe si tu as d'autres styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        /* --- STYLES SPÉCIFIQUES AU HUD (UI) --- */
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #111;
+            font-family: 'Courier New', monospace;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 30px; /* Un peu plus d'espace pour ne pas coller aux bords de l'image */
+            width: 300px;  /* Largeur fixe pour bien voir le panneau */
+            color: white;
+            
+            /* --- CONFIGURATION DE LA TEXTURE --- */
+            /* Option 1: Si tu es en pur HTML local */
+            /* background-image: url('panneau.png'); */
+            
+            /* Option 2: Si tu utilises Flask (Recommandé vu ton code) */
+            background-image: url("{{ url_for('static', filename='images/panneau.png') }}");
+            
+            background-color: rgba(0, 0, 0, 0.7); /* Fallback si l'image ne charge pas */
+            background-size: 100% 100%; /* Étire l'image pour remplir le HUD */
+            background-repeat: no-repeat;
+            
+            border: 2px solid rgba(255, 255, 255, 0.3); /* Bordure discrète par dessus */
+            border-radius: 10px;
+            pointer-events: none; /* Important : permet de cliquer sur le jeu derrière si besoin */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        /* Styles des champs inputs dans le HUD */
+        .input-display {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 5px;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .hud-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: none;
+            border-bottom: 2px solid #555;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .hud-input.active {
+            border-bottom: 2px solid #f1c40f; /* Jaune actif */
+            background: rgba(241, 196, 15, 0.1);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #ddd;
+            line-height: 1.6;
+            background: rgba(0,0,0,0.4);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
 </head>
 <body>
 
+    <!-- L'interface utilisateur (HUD) -->
     <div id="ui-layer">
         <div class="input-display">
             <label>UTILISATEUR :</label>
-            <input type="text" id="vis-username" class="hud-input active" readonly>
+            <input type="text" id="vis-username" class="hud-input active" readonly value="">
         </div>
         <div class="input-display">
             <label>MOT DE PASSE :</label>
-            <input type="password" id="vis-password" class="hud-input" readonly>
+            <input type="password" id="vis-password" class="hud-input" readonly value="">
         </div>
         <div class="instructions">
-            [Z,Q,S,D]: Bouger <br>
-            [F] : Entrer / Valider <br>
-            [K] : Changer de champ <br>
-            Allez sur la dalle "LOGIN" pour valider
+            <strong>COMMANDES :</strong><br>
+            [Z,Q,S,D] : Se déplacer<br>
+            [F] : Interagir / Taper<br>
+            [K] : Changer de champ<br>
+            <em style="color:#f1c40f;">Allez sur la dalle "LOGIN" pour valider</em>
         </div>
     </div>
 
+    <!-- Le Canvas du Jeu -->
     <canvas id="gameCanvas"></canvas>
 
+    <!-- Formulaire caché pour l'envoi des données -->
     <form id="hidden-form" method="POST" style="display:none;">
         <input type="text" name="username" id="real-username">
         <input type="password" name="password" id="real-password">
