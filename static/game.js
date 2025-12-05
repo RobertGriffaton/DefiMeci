@@ -42,8 +42,8 @@ window.onload = function() {
     // Chemins des images
     textures.player.src = '/static/images/knight.png'; // <--- NOUVEAU
     textures.key.src = '/static/images/case.png';
-    textures.door_abc.src = '/static/images/door_abc.png';
-    textures.door_ABC.src = '/static/images/door_ABC.png';
+    textures.door_abc.src = '/static/images/door_uncap.png';
+    textures.door_ABC.src = '/static/images/door_cap.png';
     textures.door_123.src = '/static/images/door_123.png';
     textures.door_special.src = '/static/images/door_special.png';
     textures.door_exit.src = '/static/images/door_exit.png';
