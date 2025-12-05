@@ -2,6 +2,10 @@
 <html>
 <head><title>Inscription</title></head>
 <body>
+<button id="musique-button" onclick="document.getElementById('musique').play()">🎵 Jouer la musique</button>
+
+<audio id="musique" src="/static/audio/dark-fantasy-ambient-dungeon-synth-248213.mp3" loop></audio>
+  
     <h2>Créer un compte</h2>
     
     {% with messages = get_flashed_messages() %}

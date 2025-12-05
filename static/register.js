@@ -1,5 +1,5 @@
 window.onload = function() {
-    console.log("🚀 Démarrage du jeu : Mode Chevalier (HUD Texture)...");
+    console.log("🚀 Démarrage du jeu : Mode Chevalier (avec bouton RETOUR)...");
 
     // --- 0. PRÉPARATION DE LA PAGE (INJECTION) ---
     const originalContent = document.getElementById('original-content') || document.body.firstElementChild;
@@ -26,7 +26,6 @@ window.onload = function() {
     hud.style.pointerEvents = 'none';
     hud.style.fontFamily = 'Arial, sans-serif';
     
-    // Modification ici pour utiliser panneau.png
     hud.innerHTML = `
         <div style="
             display:inline-block; 
@@ -36,7 +35,7 @@ window.onload = function() {
             padding: 40px 30px; 
             width: 350px;
             color: #ecf0f1;
-            text-shadow: 2px 2px 4px #000000; /* Ombre pour lisibilité sur la texture */
+            text-shadow: 2px 2px 4px #000000;
         ">
             <div id="hud-user-box" style="border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom:10px; margin-bottom:10px;">
                 <small style="color:#f1c40f; font-weight:bold; font-size:12px;">USERNAME</small><br>
@@ -48,7 +47,7 @@ window.onload = function() {
             </div>
         </div>
         <div style="color:rgba(255,255,255,0.8); font-size:14px; margin-top:10px; text-shadow: 1px 1px 2px black;">
-            Flèches: Bouger | F: Frapper | K: Changer de champ
+            z q s d : Bouger | F: Frapper | K: Changer de champ
         </div>
     `;
     document.body.appendChild(hud);
@@ -96,7 +95,7 @@ window.onload = function() {
     textures.door_123.src = '/static/images/door_123.png';
     textures.door_special.src = '/static/images/door_special.png';
     textures.door_exit.src = '/static/images/door_exit.png';
-    textures.door_login.src = '/static/images/door_login.png';
+    textures.door_login.src = '/static/images/door_sign_up.png';
 
     // --- 3. LOGIQUE ---
     function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
@@ -112,7 +111,7 @@ window.onload = function() {
         let objects = [];
         const minX = 50, maxX = canvas.width - 60, minY = 150, maxY = canvas.height - 200;    
 
-        // Touches
+        // 1. Touches aléatoires (Caisse en bois)
         chars.forEach(char => {
             let placed = false, attempts = 0;
             while (!placed && attempts < 100) {
@@ -124,9 +123,20 @@ window.onload = function() {
             }
         });
 
-        // Configuration des portes alignées en bas (Avec HUB/EXIT incluse)
+        // 2. AJOUT : La boite "DEL" (Supprimer) - En haut à droite
+        objects.push({ 
+            type: 'key', 
+            val: 'BACK', 
+            label: '⌫', 
+            x: canvas.width - 120, 
+            y: 100, 
+            size: 70, 
+            color: '#c0392b' // Rouge foncé
+        });
+
+        // 3. Configuration des portes alignées en bas
         const allSlots = [ {id:'lowercase'}, {id:'uppercase'}, {id:'numbers'}, {id:'special'}, {id:'hub'} ];
-        const activeSlots = allSlots.filter(slot => slot.id !== thisWorld); // On retire le monde actuel
+        const activeSlots = allSlots.filter(slot => slot.id !== thisWorld); 
 
         const doorSize = 100;
         const gap = 120;
@@ -136,7 +146,7 @@ window.onload = function() {
 
         activeSlots.forEach((slot, i) => {
             let color = '#e67e22';
-            if (slot.id === 'hub') color = '#c0392b'; // Exit en rouge si pas de texture
+            if (slot.id === 'hub') color = '#c0392b';
             
             objects.push({ 
                 type: 'door', 
@@ -158,6 +168,10 @@ window.onload = function() {
             { type: 'door', target: 'uppercase', label: 'ABC', x: canvas.width/2 - 100, y: 200, size: 120, color: '#e67e22' },
             { type: 'door', target: 'numbers',   label: '123', x: canvas.width/2 + 50, y: 200, size: 120, color: '#e67e22' },
             { type: 'door', target: 'special',   label: '#@&', x: canvas.width/2 + 200, y: 200, size: 120, color: '#e67e22' },
+            
+            // AJOUT : Bouton DEL aussi dans le HUB
+            { type: 'key', val: 'BACK', label: '⌫', x: canvas.width/2 + 150, y: canvas.height - 250, size: 80, color: '#c0392b' },
+
             { type: 'submit', label: ' ', x: canvas.width/2 - 100, y: canvas.height - 250, size: 200, color: '#3498db' }
         ],
         'lowercase': createScatteredWorld("azertyuiopqsdfghjklmwxcvbn".split(''), 'lowercase'),
@@ -210,10 +224,9 @@ window.onload = function() {
 
     function switchField() {
         activeField = (activeField === 'username') ? 'password' : 'username';
-        // Petit effet visuel : on change la couleur du texte selon le champ actif
         if(activeField === 'username') {
-            visInputs.username.style.color = '#2ecc71'; // Vert
-            visInputs.password.style.color = '#ecf0f1'; // Blanc cassé
+            visInputs.username.style.color = '#2ecc71';
+            visInputs.password.style.color = '#ecf0f1';
         } else {
             visInputs.username.style.color = '#ecf0f1';
             visInputs.password.style.color = '#2ecc71';
@@ -243,7 +256,11 @@ window.onload = function() {
         if (objects) {
             objects.forEach(obj => {
                 let imgToDraw = null;
-                if (obj.type === 'key') imgToDraw = textures.key;
+
+                // LOGIQUE D'AFFICHAGE MODIFIÉE
+                // Si c'est une clé ET que ce n'est PAS "BACK", on met la texture caisse
+                if (obj.type === 'key' && obj.val !== 'BACK') imgToDraw = textures.key;
+                
                 else if (obj.type === 'submit') imgToDraw = textures.door_login;
                 else if (obj.type === 'door') {
                     if (obj.target === 'hub') imgToDraw = textures.door_exit;
@@ -253,11 +270,18 @@ window.onload = function() {
                     else if (obj.target === 'special') imgToDraw = textures.door_special;
                 }
 
+                // Dessin Image ou Carré Couleur
                 if (imgToDraw && imgToDraw.complete && imgToDraw.naturalHeight !== 0) {
                     ctx.drawImage(imgToDraw, obj.x, obj.y, obj.size, obj.size);
                 } else {
+                    // C'est ici que le bouton DEL (rouge) sera dessiné
                     ctx.fillStyle = obj.color || 'white';
                     ctx.fillRect(obj.x, obj.y, obj.size, obj.size);
+                    
+                    // Petit contour pour faire propre
+                    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(obj.x, obj.y, obj.size, obj.size);
                 }
 
                 if (obj.isActive) {
@@ -265,11 +289,12 @@ window.onload = function() {
                     ctx.fillRect(obj.x, obj.y, obj.size, obj.size);
                 }
 
+                // Labels (Lettres sur les caisses ou DEL)
                 if (obj.type === 'key' || (obj.label !== ' ' && obj.type !== 'submit')) {
                      ctx.fillStyle = 'white'; 
                      ctx.font = 'bold 16px Arial'; 
                      ctx.textAlign = 'center';
-                     ctx.shadowColor="black"; ctx.shadowBlur=4; // Ombre texte jeu
+                     ctx.shadowColor="black"; ctx.shadowBlur=4; 
                      ctx.fillText(obj.label || obj.val, obj.x + obj.size/2, obj.y + obj.size/2 + 6);
                      ctx.shadowBlur=0;
                 }

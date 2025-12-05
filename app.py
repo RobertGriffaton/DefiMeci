@@ -53,10 +53,7 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    return """
-    <h1>Bienvenue</h1>
-    <a href="/login">Se connecter</a> | <a href="/register">Créer un compte</a>
-    """
+    return render_template('home.html')
 
 # Route d'inscription
 @app.route('/register', methods=['GET', 'POST'])

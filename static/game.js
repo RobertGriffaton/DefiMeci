@@ -12,7 +12,7 @@ window.onload = function() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // MODIFICATION 1 : J'ai passé la taille à 50 pour qu'on voit bien le chevalier
+    
     const player = { x: canvas.width / 2, y: canvas.height / 2, size: 100, speed: 5, color: '#2ecc71' };
     
     const keysPressed = {};
@@ -29,7 +29,7 @@ window.onload = function() {
 
     // --- 2. CHARGEMENT DES TEXTURES ---
     const textures = {
-        player: new Image(), // <--- NOUVEAU : Texture du joueur
+        player: new Image(), 
         key: new Image(),
         door_abc: new Image(),
         door_ABC: new Image(),
@@ -40,7 +40,7 @@ window.onload = function() {
     };
 
     // Chemins des images
-    textures.player.src = '/static/images/knight.png'; // <--- NOUVEAU
+    textures.player.src = '/static/images/knight.png'; 
     textures.key.src = '/static/images/case.png';
     textures.door_abc.src = '/static/images/door_uncap.png';
     textures.door_ABC.src = '/static/images/door_cap.png';
@@ -98,7 +98,7 @@ window.onload = function() {
 
         // Barre de navigation
         const doorSize = 120;
-        const doorY = canvas.height - 130; // Remonté un peu car les portes sont grandes
+        const doorY = canvas.height - 130; 
         const gapDoor = 130;
         const startDoorX = canvas.width - (4 * gapDoor) - 50;
         const slots = [

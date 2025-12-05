@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <title>Acceuil</title>
+    </head>
+<body>
+
+    <div id="ui-layer">
+    <div class="instructions medieval-frame">
+        <div class="sign-top-border"></div>
+        <h3 class="sign-title">📜 Instructions</h3>
+        <p class="sign-content">
+            **[Z, Q, S, D]** : Bouger <br>
+            **[F]** : Entrer / Valider <br>
+            **[K]** : Changer de champ
+        </p>
+        <div class="sign-bottom-border"></div>
+    </div>
+    </div>
+
+    <audio id="doorSound" src="{{ url_for('static', filename='sounds/wooden_door.mp3') }}" preload="auto"></audio>
+
+    <button onclick="document.getElementById('doorSound').play()" style="z-index: 9999; position: absolute; top: 10px; right: 10px;">TEST AUDIO</button> 
+
+
+
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script src="{{ url_for('static', filename='home.js') }}"></script>
+</body>
+</html>
